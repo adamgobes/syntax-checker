@@ -1,0 +1,1 @@
+void initBuffer(char *inputLine);
