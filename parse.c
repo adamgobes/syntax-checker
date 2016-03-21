@@ -6,11 +6,12 @@ typedef int BOOLEAN;
 
 
 char *buffer;
-int bufferSize = 1;
+int bufferSize;
 
 char* removeToken(char* substring, char* string) {
     int len = strlen(substring);
     if (bufferSize == 1) {
+        strtok(string, "\n");
         string += len;
     } else {
         string += len+1;
@@ -20,6 +21,7 @@ char* removeToken(char* substring, char* string) {
 
 void initBuffer(char *inputLine) {
     buffer = inputLine;
+    bufferSize = 1;
     int len = strlen(buffer);
     for(int i=0; i <= len; i++) {
         if(buffer[i] == ' ')

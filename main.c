@@ -18,17 +18,20 @@ int main(int argc, char const *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    while (fgets(buffer, sizeof(buffer), (FILE*)fp) != NULL) {
+
+    int fileLine = 0;
+    while (fgets(buffer, 255, (FILE*)fp) != NULL) {
         initBuffer(buffer);
+        fileLine++;
         while (hasNextToken()) {
             char *next = nextToken();
             if (isValidCommand(next) || isValidExpression(next)) {
-                printf("Valid!\n");
+                printf("No errors at line %d\n", fileLine);
             } else {
-                printf("Invalid!\n");
+                printf("Error at line %d\n", fileLine);
+                break;
             }
         }
-
     }
 
     return 0;
