@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "parse.h"
+#include "syntax.h"
 
 int main(int argc, char const *argv[]) {
     char file_name[25], buffer[255];
@@ -16,8 +18,17 @@ int main(int argc, char const *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    while (fgets(buffer, 255, (FILE*)fp) != NULL) {
+    while (fgets(buffer, sizeof(buffer), (FILE*)fp) != NULL) {
         initBuffer(buffer);
+        while (hasNextToken()) {
+            char *next = nextToken();
+            if (isValidCommand(next) || isValidExpression(next)) {
+                printf("Valid!\n");
+            } else {
+                printf("Invalid!\n");
+            }
+        }
+
     }
 
     return 0;
