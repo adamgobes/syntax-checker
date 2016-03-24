@@ -11,7 +11,6 @@ int bufferSize;
 char* removeToken(char* substring, char* string) {
     int len = strlen(substring);
     if (bufferSize == 1) {
-        strtok(string, "\n");
         string += len;
     } else {
         string += len+1;
@@ -37,7 +36,9 @@ BOOLEAN hasNextToken() {
 }
 
 char *nextToken() {
-    char *next = strtok(buffer, " ");
+    char *copy = malloc(bufferSize);
+    strcpy(copy, buffer);
+    char *next = strtok(copy, " ");
     buffer = removeToken(next, buffer);
     bufferSize--;
     return next;
