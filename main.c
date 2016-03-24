@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "parse.h"
 #include "syntax.h"
 
@@ -50,9 +51,20 @@ int main(int argc, char const *argv[]) {
             } else if (isValidExpression(next)) {
                 if (strcmp(next, "SAY") == 0) {
                     /* add logic to make sure token after is wrapped in quotes */
-                    
+                    char *afterSay = strtok(nextToken(), "\n");
+                    if (afterSay[0] != '"' || afterSay[strlen(afterSay)-1] != '"') {
+                        printf("Error at line %d: message must be in quotes\n" ,fileLine);
+                    }
                 } else if (strcmp(next, "REPEAT") == 0) {
                     /* add logic to make sure expression is a valid for loop */
+                    char *digits = strtok(nextToken(), "\n");
+                    for (int i = 0; i < strlen(digits); i++) {
+                        if (!isdigit(digits[i])) {
+                            printf("Error at line %d: REPEAT must be followed by a number\n", fileLine);
+                            break;
+                        }
+                    }
+
                 } else if (strcmp(next, "WHILE") == 0) {
                     /* add logic to make sure expression is valid while loop */
                 }
