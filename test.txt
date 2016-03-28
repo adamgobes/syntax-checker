@@ -1,1 +1,2 @@
-REPEAT hello times
+while not DETECTMARKER do Whateveer
+RIGHTT RIGHT

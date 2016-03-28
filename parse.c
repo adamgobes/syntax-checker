@@ -6,6 +6,7 @@ typedef int BOOLEAN;
 
 
 char *buffer;
+char *initialBuffer;
 int bufferSize;
 
 char* removeToken(char* substring, char* string) {
@@ -26,6 +27,8 @@ void initBuffer(char *inputLine) {
         if(buffer[i] == ' ')
             bufferSize++;
     }
+    initialBuffer = malloc(bufferSize);
+    strcpy(initialBuffer, buffer);
 }
 
 
@@ -41,5 +44,10 @@ char *nextToken() {
     char *next = strtok(copy, " ");
     buffer = removeToken(next, buffer);
     bufferSize--;
+    free(copy);
     return next;
+}
+
+void myRewind() {
+    buffer = initialBuffer;
 }

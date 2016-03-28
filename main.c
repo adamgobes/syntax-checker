@@ -5,21 +5,38 @@
 #include "parse.h"
 #include "syntax.h"
 
+void upperString(char *word) {
+    for (int i = 0; i < strlen(word); i++) {
+        if (word[i] >= 'a' && word[i] <= 'z')
+            word[i] = toupper(word[i]);
+    }
+}
+
 char *errorString(char *inputLine, char *offence) {
+    int oneLine = 0;
+    if (strcmp(inputLine, offence) == 0) {
+        oneLine = 1;
+    }
     char *copy = malloc(strlen(inputLine));
     strcpy(copy, inputLine);
-    int lengthBeforeError = strlen(inputLine) - strlen(strstr(copy, offence));
+    int lengthAfterError = strlen(strstr(copy, offence));
+    int lengthBeforeError = strlen(inputLine) - lengthAfterError;
     char *upToError = malloc(lengthBeforeError);
+    upToError[lengthBeforeError] = '\0';
     strncpy(upToError, copy, lengthBeforeError);
-    char *errorString = malloc(strlen(inputLine) + 3);
     char *asterix = malloc(strlen(offence) + 3);
     strcat(asterix, "***");
     offence = strcat(asterix, offence);
     free(asterix);
+    if (oneLine) {
+        return offence;
+    }
+    char *errorString = malloc(strlen(inputLine) + 3);
     strncpy(errorString, inputLine, strlen(upToError));
     errorString[strlen(inputLine)] = '\0';
     strcat(errorString, offence);
     strcat(errorString, inputLine+lengthBeforeError+strlen(offence)-3);
+    printf("%s\n", errorString);
     return errorString;
 }
 
@@ -40,6 +57,7 @@ int main(int argc, char const *argv[]) {
 
     int fileLine = 0;
     while (fgets(inputLine, 255, (FILE*)fp) != NULL) {
+        upperString(inputLine);
         initBuffer(inputLine);
         fileLine++;
         while (hasNextToken()) {
@@ -47,6 +65,7 @@ int main(int argc, char const *argv[]) {
             if (isValidCommand(next)) {
                 if (hasNextToken()) {
                     printf("Error at line %d: Only one command per line\n", fileLine);
+                    break;
                 }
             } else if (isValidExpression(next)) {
                 if (strcmp(next, "SAY") == 0) {
@@ -54,6 +73,7 @@ int main(int argc, char const *argv[]) {
                     char *afterSay = strtok(nextToken(), "\n");
                     if (afterSay[0] != '"' || afterSay[strlen(afterSay)-1] != '"') {
                         printf("Error at line %d: message must be in quotes\n" ,fileLine);
+                        break;
                     }
                 } else if (strcmp(next, "REPEAT") == 0) {
                     /* add logic to make sure expression is a valid for loop */
@@ -64,9 +84,49 @@ int main(int argc, char const *argv[]) {
                             break;
                         }
                     }
+                    char *times = strtok(nextToken(), "\n");
+                    if (strcmp(times, "TIMES") != 0) {
+                        printf("Error at line %d: REPEAT expression must contain TIMES\n", fileLine);
+                        break;
+                    }
+
+                    while (hasNextToken()) {
+                        char *command = strtok(nextToken(), ",");
+                        command = strtok(command, "\n");
+                        if (!isValidCommand(command)) {
+                            printf("Error at line %d: REPEAT expression must contain valid commands\n", fileLine);
+                        }
+                    }
 
                 } else if (strcmp(next, "WHILE") == 0) {
                     /* add logic to make sure expression is valid while loop */
+                    char *not = strtok(nextToken(), "\n");
+                    if (strcmp(not, "NOT") != 0) {
+                        printf("Error at line %d: WHILE must be followed by NOT\n", fileLine);
+                        break;
+                    }
+
+                    char *c = strtok(nextToken(), "\n");
+                    if (strcmp(c, "DETECTMARKER") != 0) {
+                        printf("Error at line %d: WHILE must contain boolean DETECTMARKER\n", fileLine);
+                        break;
+                    }
+
+                    char *doStatement = strtok(nextToken(), "\n");
+                    if (strcmp(doStatement, "DO") != 0) {
+                        printf("Error at line %d: WHILE must contain DO\n", fileLine);
+                        break;
+                    }
+
+                    while (hasNextToken()) {
+                        char *command = strtok(nextToken(), ",");
+                        command = strtok(command, "\n");
+                        if (!isValidCommand(command)) {
+                            printf("Error at line %d: WHILE expression must contain valid commands\n", fileLine);
+                            break;
+                        }
+                    }
+
                 }
             }
 
